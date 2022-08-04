@@ -1,14 +1,14 @@
 //  Network Topology
 //
 //       10.1.1.0
-// n0 -------------- n1--------n2  
+// n0 -------------- n1--------n2 , n3,  n4
 //    LAN 10.1.2.0   
 //                    ================
 //                      LAN 10.1.2.0
 //   L1 -> 5Mbps, 2ms
 //   L2 -> 10Mbps, 5ms
-//  n0 - client, n2- server
-//
+//  n0 - client, n2- server, n3- server. n4 -server
+//  
 
 
 #include "ns3/netanim-module.h"
@@ -26,8 +26,8 @@ int
 main (int argc, char *argv[])
 {
 	Time::SetResolution (Time::NS);
-	LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
-	LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
+	LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_ALL);
+	LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_ALL);
 
 	NodeContainer nodes;
 	nodes.Create(5);
@@ -57,7 +57,6 @@ main (int argc, char *argv[])
 	p2p2.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
 	p2p2.SetChannelAttribute ("Delay", StringValue ("5ms"));
 
-
 	// client and leader node
 	Ipv4AddressHelper address;
 	address.SetBase ("10.1.1.0","255.255.255.0");
@@ -84,29 +83,48 @@ main (int argc, char *argv[])
 	Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 	
 	UdpEchoServerHelper echoServer (9);
+	UdpEchoServerHelper echoServer1 (9);
+	UdpEchoServerHelper echoServer2 (9);
 	
 	ApplicationContainer serverApps = echoServer.Install (nodes.Get (2));
-	ApplicationContainer serverApps1 = echoServer.Install (nodes.Get (3));
-	ApplicationContainer serverApps2 = echoServer.Install (nodes.Get (4));
+	ApplicationContainer serverApps1 = echoServer1.Install (nodes.Get (3));
+	ApplicationContainer serverApps2 = echoServer2.Install (nodes.Get (4));
 
 	serverApps.Start (Seconds (1.0));
 	serverApps.Stop (Seconds (10.0));
+
+	serverApps1.Start (Seconds (1.0));
+	serverApps1.Stop (Seconds (10.0));
+
+	serverApps2.Start (Seconds (1.0));
+	serverApps2.Stop (Seconds (10.0));
 	
 	UdpEchoClientHelper echoClient (interfaces.GetAddress (1), 9);
 	echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
 	echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
 	echoClient.SetAttribute ("PacketSize",UintegerValue (1024));
 
+	
+
 	ApplicationContainer clientApps = echoClient.Install (nodes.Get (0));
 	clientApps.Start (Seconds (2.0));
 	clientApps.Stop (Seconds (10.0));
 
+	UdpEchoClientHelper echoClient1 (interfaces.GetAddress (1), 9);
+	echoClient1.SetAttribute ("MaxPackets", UintegerValue (1));
+	echoClient1.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
+	echoClient1.SetAttribute ("PacketSize",UintegerValue (1024));
+
+	ApplicationContainer clientApps1 = echoClient1.Install (nodes.Get (1));
+	clientApps1.Start (Seconds (2.0));
+	clientApps1.Stop (Seconds (10.0));
+
 	AnimationInterface anim ("FBFTRequest.xml");
-	anim.SetConstantPosition(nodes.Get(0), 10.0, 10.0);
-	anim.SetConstantPosition(nodes.Get(1), 20.0,20.0);
-	anim.SetConstantPosition(nodes.Get(2), 30.0, 30.0);
-	anim.SetConstantPosition(nodes.Get(3), 40.0, 40.0);
-	anim.SetConstantPosition(nodes.Get(4), 50.0, 50.0);
+	// anim.SetConstantPosition(nodes.Get(0), 10.0, 10.0);
+	// anim.SetConstantPosition(nodes.Get(1), 20.0,20.0);
+	// anim.SetConstantPosition(nodes.Get(2), 30.0, 40.0);
+	// anim.SetConstantPosition(nodes.Get(3), 40.0, 50.0);
+	// anim.SetConstantPosition(nodes.Get(4), 50.0, 60.0);
 
 	Simulator::Run();
 	Simulator::Destroy();

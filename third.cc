@@ -25,6 +25,7 @@
 #include "ns3/ssid.h"
 #include "ns3/netanim-module.h"
 
+
 // Default Network Topology
 //
 //   Wifi 10.1.3.0
@@ -72,15 +73,15 @@ main (int argc, char *argv[])
     }
 
   NodeContainer p2pNodes;
-  p2pNodes.Create (2);
+  p2pNodes.Create (2); //no and n1 will be created
 
   PointToPointHelper pointToPoint;
-  pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
-  pointToPoint.SetChannelAttribute ("Delay", StringValue ("2ms"));
+  pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps")); //Bandwidth
+  pointToPoint.SetChannelAttribute ("Delay", StringValue ("2ms")); //delay
 
   NetDeviceContainer p2pDevices;
   p2pDevices = pointToPoint.Install (p2pNodes);
-
+ 
   NodeContainer csmaNodes;
   csmaNodes.Add (p2pNodes.Get (1));
   csmaNodes.Create (nCsma);
@@ -96,9 +97,10 @@ main (int argc, char *argv[])
   wifiStaNodes.Create (nWifi);
   NodeContainer wifiApNode = p2pNodes.Get (0);
 
+  // Yet Another Network Simulator
   YansWifiChannelHelper channel = YansWifiChannelHelper::Default ();
   YansWifiPhyHelper phy = YansWifiPhyHelper::Default ();
-  phy.SetChannel (channel.Create ());
+  phy.SetChannel (channel.Create ()); // Communication part
 
   WifiHelper wifi;
   wifi.SetRemoteStationManager ("ns3::AarfWifiManager");

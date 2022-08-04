@@ -21,6 +21,7 @@
 #include "ns3/point-to-point-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/ipv4-global-routing-helper.h"
+#include "ns3/netanim-module.h"
 
 // Default Network Topology
 //
@@ -30,26 +31,16 @@
 //                    ================
 //                      LAN 10.1.2.0
 
-// n0 is referred as p2pnodes.Get(0) and is the client
-// n1 is referred as csmaNodes.Get(0) or p2pNodes.Get(1)
-// n4 is  the server
-
-// node 1 knows it needs to send the packet to IP address 10.1.2.4, but it doesnt know the MAC address of the corresponding node
-// It broadcasts on the CSMA network asking for the device that has IP address of 10.1.2.4
-// In this case, the rightmost node replies that it is at MAC address 00.00.
-// node 2 is not directly involved in this exchange but is sniffing the network and reporting all of the traffic it sees
-
-
 
 using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("SecondScriptExample");
 
-int 
+int
 main (int argc, char *argv[])
 {
   bool verbose = true;
-  uint32_t nCsma = 3; //unsigned integer 32bits
+  uint32_t nCsma = 3;
 
   CommandLine cmd (__FILE__);
   cmd.AddValue ("nCsma", "Number of \"extra\" CSMA nodes/devices", nCsma);
@@ -59,8 +50,8 @@ main (int argc, char *argv[])
 
   if (verbose)
     {
-      LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO); //UDP client application
-      LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO); //UDP server application
+      LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_ALL);
+      LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_ALL);
     }
 
   nCsma = nCsma == 0 ? 1 : nCsma;
@@ -69,8 +60,8 @@ main (int argc, char *argv[])
   p2pNodes.Create (2);
 
   NodeContainer csmaNodes;
-  csmaNodes.Add (p2pNodes.Get (1)); //make the first node
-  csmaNodes.Create (nCsma); // nCsma=3 already declared
+  csmaNodes.Add (p2pNodes.Get (1));
+  csmaNodes.Create (nCsma);
 
   PointToPointHelper pointToPoint;
   pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
@@ -102,7 +93,6 @@ main (int argc, char *argv[])
   UdpEchoServerHelper echoServer (9);
 
   ApplicationContainer serverApps = echoServer.Install (csmaNodes.Get (nCsma));
-  //The server is csmaNodes.Get(3) - n4 is the server.
   serverApps.Start (Seconds (1.0));
   serverApps.Stop (Seconds (10.0));
 
@@ -120,6 +110,11 @@ main (int argc, char *argv[])
   pointToPoint.EnablePcapAll ("second");
   csma.EnablePcap ("second", csmaDevices.Get (1), true);
 
+  AnimationInterface anim ("second.xml");
+  anim.SetConstantPosition (p2pNodes.Get(0), 10.0, 20.0);
+  anim.SetConstantPosition (p2pNodes.Get(1), 20.0, 30.0);
+
+  Simulator::Stop (Seconds (20));
   Simulator::Run ();
   Simulator::Destroy ();
   return 0;

@@ -21,6 +21,7 @@
 #include "ns3/point-to-point-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/stats-module.h"
+#include "ns3/netanim-module.h"
 
 using namespace ns3;
 
@@ -309,6 +310,7 @@ main (int argc, char *argv[])
   fileHelper.WriteProbe (probeType,
                          tracePath,
                          "OutputBytes");
+  AnimationInterface anim ("seventh.xml");
 
   Simulator::Stop (Seconds (20));
   Simulator::Run ();

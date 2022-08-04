@@ -18,6 +18,7 @@
 #include "ns3/uinteger.h"
 #include "ns3/traced-value.h"
 #include "ns3/trace-source-accessor.h"
+#include "ns3/netanim-module.h"
 
 #include <iostream>
 
@@ -61,4 +62,5 @@ main (int argc, char *argv[])
   myObject->TraceConnectWithoutContext ("MyInteger", MakeCallback (&IntTrace));
 
   myObject->m_myInt = 1234;
+ 
 }

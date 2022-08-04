@@ -20,6 +20,8 @@
 #include "ns3/internet-module.h"
 #include "ns3/point-to-point-module.h"
 #include "ns3/applications-module.h"
+#include "ns3/netanim-module.h"
+
 
 using namespace ns3;
 
@@ -216,6 +218,7 @@ main (int argc, char *argv[])
   app->SetStopTime (Seconds (20.));
 
   devices.Get (1)->TraceConnectWithoutContext ("PhyRxDrop", MakeCallback (&RxDrop));
+  AnimationInterface anim ("fifth.xml");
 
   Simulator::Stop (Seconds (20));
   Simulator::Run ();

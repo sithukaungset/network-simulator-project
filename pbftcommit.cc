@@ -20,7 +20,7 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("Script tutorial");
+NS_LOG_COMPONENT_DEFINE ("PBFT commit");
 
 int 
 main (int argc, char *argv[])

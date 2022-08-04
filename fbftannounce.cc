@@ -38,8 +38,8 @@ int main (int argc, char *argv[])
   cmd.Parse (argc, argv);
   
   Time::SetResolution (Time::NS);
-  LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
+  LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_ALL);
+  LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_ALL);
 
   
   // number of nodes
@@ -59,7 +59,9 @@ int main (int argc, char *argv[])
 
   NetDeviceContainer devices;
   devices = pointToPoint.Install (nodes.Get(0), nodes.Get(1));
-  devices = pointToPoint1.Install (nodes.Get(0), nodes.Get(2));
+
+  NetDeviceContainer devices1;
+  devices1 = pointToPoint1.Install (nodes.Get(0), nodes.Get(2));
   //Two nodes,each with an installed point-to-point net device and a single point-to-point channel between them.
   //Both devices will be configured to transmit data at five megabits per second over the channel which has a two millisecond transmission delay.
 
@@ -71,6 +73,10 @@ int main (int argc, char *argv[])
   Ipv4AddressHelper address;
   address.SetBase ("10.1.1.0", "255.255.255.0"); //IP address and net mask (10.1.1.1/10.1.1.2)
 
+  Ipv4AddressHelper address1;
+  address1.SetBase ("10.1.2.0", "255.255.255.0");
+
+  Ipv4InterfaceContainer interfaces1 = address1.Assign (devices1); 
   Ipv4InterfaceContainer interfaces = address.Assign (devices); //makes the association between an IP address and a device using Ipv4Interface object
   // Now, we have a point-to-point network built with stacks installed and IP addresses assigned. 
 
@@ -91,7 +97,7 @@ int main (int argc, char *argv[])
   echoClient.SetAttribute ("PacketSize", UintegerValue (1024));//tells how large the packet payloads should be
   //tells client to send one 1024-byte packet.
   
-  UdpEchoClientHelper echoClient1 (interfaces.GetAddress (1), 19);
+  UdpEchoClientHelper echoClient1 (interfaces1.GetAddress (1), 19);
   echoClient1.SetAttribute ("MaxPackets", UintegerValue (1)); //tells the client maximum number of packets allowed to send during simulation
   echoClient1.SetAttribute ("Interval", TimeValue (Seconds (1.0))); // tells how long to wait between packets 
   echoClient1.SetAttribute ("PacketSize", UintegerValue (1024));//tells how large the packet payloads should be

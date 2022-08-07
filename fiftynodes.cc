@@ -40,7 +40,7 @@ int
 main (int argc, char *argv[])
 {
   bool verbose = true;
-  uint32_t nCsma = 3;
+  uint32_t nCsma = 50;
 
   CommandLine cmd (__FILE__);
   cmd.AddValue ("nCsma", "Number of \"extra\" CSMA nodes/devices", nCsma);
@@ -77,8 +77,6 @@ main (int argc, char *argv[])
   NetDeviceContainer csmaDevices;
   csmaDevices = csma.Install (csmaNodes);
 
-
-
   InternetStackHelper stack;
   stack.Install (p2pNodes.Get (0));
   stack.Install (csmaNodes);
@@ -92,40 +90,34 @@ main (int argc, char *argv[])
   Ipv4InterfaceContainer csmaInterfaces;
   csmaInterfaces = address.Assign (csmaDevices);
 
-
-
   UdpEchoServerHelper echoServer (9);
-
+  UdpEchoServerHelper echoServer1 (19);
 
   ApplicationContainer serverApps = echoServer.Install (csmaNodes.Get (nCsma));
-
+  ApplicationContainer serverApps1 = echoServer1.Install (csmaNodes.Get (0));
 
   serverApps.Start (Seconds (1.0));
   serverApps.Stop (Seconds (10.0));
 
-
+  serverApps1.Start (Seconds (1.0));
+  serverApps1.Stop (Seconds (10.0));
 
 
   UdpEchoClientHelper echoClient (csmaInterfaces.GetAddress (nCsma), 9);
   echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
   echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.0)));
   echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
-  
-
- 
 
   ApplicationContainer clientApps = echoClient.Install (p2pNodes.Get (0));
   clientApps.Start (Seconds (2.0));
   clientApps.Stop (Seconds (10.0));
 
-
-
   Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
-  pointToPoint.EnablePcapAll ("second");
-  csma.EnablePcap ("second", csmaDevices.Get (1), true);
+  pointToPoint.EnablePcapAll ("fiftynodes");
+  csma.EnablePcap ("fiftynodes", csmaDevices.Get (1), true);
 
-  AnimationInterface anim ("second.xml");
+  AnimationInterface anim ("fiftynodes.xml");
   // anim.SetConstantPosition (p2pNodes.Get(0), 10.0, 20.0);
   // anim.SetConstantPosition (p2pNodes.Get(1), 20.0, 30.0);
 

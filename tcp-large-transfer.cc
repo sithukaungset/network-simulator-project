@@ -45,6 +45,7 @@ using namespace ns3;
 
 NS_LOG_COMPONENT_DEFINE ("TcpLargeTransfer");
 
+
 // The number of bytes to send in this simulation.
 static const uint32_t totalTxBytes = 2000000;
 static uint32_t currentTxBytes = 0;
@@ -71,10 +72,10 @@ int main (int argc, char *argv[])
 {
   // Users may find it convenient to turn on explicit debugging
   // for selected modules; the below lines suggest how to do this
-  //  LogComponentEnable("TcpL4Protocol", LOG_LEVEL_ALL);
-  //  LogComponentEnable("TcpSocketImpl", LOG_LEVEL_ALL);
-  //  LogComponentEnable("PacketSink", LOG_LEVEL_ALL);
-  //  LogComponentEnable("TcpLargeTransfer", LOG_LEVEL_ALL);
+    LogComponentEnable("TcpL4Protocol", LOG_LEVEL_INFO);
+    //LogComponentEnable("TcpSocketImpl", LOG_LEVEL_ALL);
+    LogComponentEnable("PacketSink", LOG_LEVEL_INFO);
+    LogComponentEnable("TcpLargeTransfer", LOG_LEVEL_INFO);
 
   CommandLine cmd (__FILE__);
   cmd.Parse (argc, argv);
